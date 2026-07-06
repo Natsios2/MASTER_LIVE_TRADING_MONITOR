@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "generated_at": "2026-07-06 20:32:24",
+  "source": "C:\\Users\\User\\Desktop\\Projekt Trading\\Gold_Straddle_AI\\MASTER_LIVE_TRADING_MONITOR_V2\\dashboard_mobile",
+  "target": "C:\\Users\\User\\Desktop\\Projekt Trading\\Gold_Straddle_AI\\MASTER_LIVE_TRADING_MONITOR_V2\\publish_web",
+  "purpose": "GitHub Pages / online dashboard publish folder",
+  "note": "Dashboard publishing only. No strategy logic."
+}

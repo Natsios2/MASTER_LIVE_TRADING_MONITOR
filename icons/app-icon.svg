@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MASTER Live Trading Monitor">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="138" cy="146" r="44" fill="url(#gold)"/>
+  <circle cx="374" cy="146" r="44" fill="#cbd5e1"/>
+  <path d="M108 332 L176 268 L238 306 L324 206 L404 272" fill="none" stroke="#ffffff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M100 386 H412" stroke="#93c5fd" stroke-width="28" stroke-linecap="round"/>
+  <text x="256" y="454" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="800" fill="#ffffff">LIVE</text>
+</svg>

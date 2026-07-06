@@ -1,0 +1,29 @@
+{
+  "name": "MASTER Live Trading Monitor",
+  "short_name": "Live Monitor",
+  "description": "Live-Trading Dashboard fuer Gold, Silver und Portfolio. Nur Journal, Dashboard und Reporting.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#f4f7fb",
+  "theme_color": "#111827",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "icons/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard öffnen",
+      "short_name": "Dashboard",
+      "url": "./index.html",
+      "description": "Live-Trading Dashboard öffnen"
+    }
+  ]
+}

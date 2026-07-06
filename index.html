@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MASTER LIVE TRADING MONITOR V3</title>
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Live Monitor">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/app-icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">MASTER LIVE TRADING MONITOR V3</p>
+      <h1>Live Dashboard</h1>
+      <p>Interaktives Analyse-Dashboard auf Basis der offiziellen cTrader CSV Statements. Keine Handelslogik, keine Strategieänderung.</p>
+    </div>
+    <div class="hero-card">
+      <span>Kontostand</span>
+      <strong id="currentBalance">0,00 EUR</strong>
+      <small id="generatedAt"></small>
+    </div>
+  </header>
+
+  <section class="filters">
+    <label>Symbol<select id="symbolFilter"><option value="">Alle</option></select></label>
+    <label>Monat<select id="monthFilter"><option value="">Alle</option></select></label>
+    <label>Kalenderwoche<select id="weekFilter"><option value="">Alle</option></select></label>
+    <label>Jahr<select id="yearFilter"><option value="">Alle</option></select></label>
+  </section>
+
+  <section class="quick-actions">
+    <button id="goldButton" class="pill gold">Gold anzeigen</button>
+    <button id="silverButton" class="pill silver">Silber anzeigen</button>
+    <button id="portfolioButton" class="pill portfolio">Portfolio anzeigen</button>
+  </section>
+
+  <section class="panel open-trades">
+    <div class="panel-title-row">
+      <h2>OFFENE TRADES</h2>
+      <span id="openTradeTotal" class="badge">0 offen</span>
+    </div>
+    <div id="openTradesContent" class="open-grid"></div>
+  </section>
+
+  <section class="cards" id="kpiCards"></section>
+
+  <section class="analysis-layout">
+    <article class="panel">
+      <div class="panel-title-row">
+        <h2>Kalenderansicht</h2>
+        <select id="calendarMonth"></select>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+      <div id="weekLinks" class="chip-row"></div>
+      <div id="monthLinks" class="chip-row"></div>
+      <p class="legend">🟢 Gewinntag · 🔴 Verlusttag · 🟡 Break-even · ⚪ Kein Trade</p>
+    </article>
+    <article class="panel">
+      <h2>Analyse-Details</h2>
+      <div id="detailPanel" class="detail-panel">Klicke auf einen Tag, eine Kalenderwoche, einen Monat oder einen Trade.</div>
+    </article>
+  </section>
+
+  <section class="grid">
+    <article class="panel"><h2>Equity-Kurve</h2><canvas id="equityChart"></canvas></article>
+    <article class="panel"><h2>Drawdown-Kurve</h2><canvas id="drawdownChart"></canvas></article>
+    <article class="panel"><h2>Kontostand-Verlauf</h2><canvas id="balanceChart"></canvas></article>
+    <article class="panel"><h2>Gold vs Silver</h2><canvas id="strategyChart"></canvas></article>
+    <article class="panel"><h2>Gewinn pro Monat</h2><canvas id="monthlyChart"></canvas></article>
+    <article class="panel"><h2>Gewinn pro Kalenderwoche</h2><canvas id="weeklyChart"></canvas></article>
+  </section>
+
+  <section class="panel">
+    <h2>Letzte Trades</h2>
+    <input id="searchBox" class="search" placeholder="Suche in Trades...">
+    <div class="table-wrap">
+      <table id="tradeTable">
+        <thead><tr><th>Zeit</th><th>Symbol</th><th>Strategie</th><th>Richtung</th><th>Lot</th><th>PnL EUR</th><th>Balance EUR</th><th>Details</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <button id="modalClose" class="modal-close">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script id="monitor-data" type="application/json">{"generated_at": "2026-07-06 18:57:40", "source": "cTrader CSV Statement", "current_balance": 1202.27, "current_equity": 1202.27, "free_margin": 1202.27, "margin": 0.0, "unrealized_pl": 0.0, "realized_pl": -82.28, "summary": {"Gold": {"trades": 2, "wins": 0, "losses": 2, "break_even": 0, "net": -82.28, "gross_profit": 0, "gross_loss": -82.28, "profit_factor": 0.0, "winrate": 0.0, "avg_win": 0.0, "avg_loss": -41.14, "expectancy": -41.14, "max_drawdown": 82.28, "win_streak": 0, "loss_streak": 2}, "Silver": {"trades": 0, "wins": 0, "losses": 0, "break_even": 0, "net": 0, "gross_profit": 0, "gross_loss": 0, "profit_factor": 0.0, "winrate": 0.0, "avg_win": 0.0, "avg_loss": 0.0, "expectancy": 0.0, "max_drawdown": 0.0, "win_streak": 0, "loss_streak": 0}, "Portfolio": {"trades": 2, "wins": 0, "losses": 2, "break_even": 0, "net": -82.28, "gross_profit": 0, "gross_loss": -82.28, "profit_factor": 0.0, "winrate": 0.0, "avg_win": 0.0, "avg_loss": -41.14, "expectancy": -41.14, "max_drawdown": 82.28, "win_streak": 0, "loss_streak": 2}}, "weekly": [{"trades": 2, "wins": 0, "losses": 2, "break_even": 0, "net": -82.28, "gross_profit": 0, "gross_loss": -82.28, "profit_factor": 0.0, "winrate": 0.0, "avg_win": 0.0, "avg_loss": -41.14, "expectancy": -41.14, "max_drawdown": 82.28, "win_streak": 0, "loss_streak": 2, "period": "2026-KW28", "gold_net": -82.28, "silver_net": 0}], "monthly": [{"trades": 2, "wins": 0, "losses": 2, "break_even": 0, "net": -82.28, "gross_profit": 0, "gross_loss": -82.28, "profit_factor": 0.0, "winrate": 0.0, "avg_win": 0.0, "avg_loss": -41.14, "expectancy": -41.14, "max_drawdown": 82.28, "win_streak": 0, "loss_streak": 2, "period": "2026-07", "gold_net": -82.28, "silver_net": 0}], "yearly": [{"trades": 2, "wins": 0, "losses": 2, "break_even": 0, "net": -82.28, "gross_profit": 0, "gross_loss": -82.28, "profit_factor": 0.0, "winrate": 0.0, "avg_win": 0.0, "avg_loss": -41.14, "expectancy": -41.14, "max_drawdown": 82.28, "win_streak": 0, "loss_streak": 2, "period": "2026", "gold_net": -82.28, "silver_net": 0}], "curve": [{"time": "2026-07-06 00:32:55", "symbol": "XAUUSD", "strategy": "Gold", "pnl": -40.46, "equity": -40.46, "drawdown": -40.46, "balance": 1244.09}, {"time": "2026-07-06 11:29:06", "symbol": "XAUUSD", "strategy": "Gold", "pnl": -41.82, "equity": -82.28, "drawdown": -82.28, "balance": 1202.27}], "trades": [{"trade_id": "CTRADER-XAUUSD-SELL-20260706003255-001", "symbol": "XAUUSD", "strategy": "Gold", "direction": "Sell", "closing_time": "2026-07-06 00:32:55", "year": 2026, "month": "2026-07", "week": 28, "entry_price": 4165.03, "closing_price": 4188.47, "quantity": 0.02, "net_eur": -40.46, "balance_eur": 1244.09, "account_balance": 1202.27, "equity": 1202.27, "free_margin": 1202.27, "margin": 0.0, "margin_level": "n/a", "unrealized_pl": 0.0, "realized_pl": -82.28, "deposit": 5683.06, "withdrawal": -3673.56, "total_net": 2009.5, "source_file": "statement-18_31 06.07.2026.csv"}, {"trade_id": "CTRADER-XAUUSD-BUY-20260706112906-002", "symbol": "XAUUSD", "strategy": "Gold", "direction": "Buy", "closing_time": "2026-07-06 11:29:06", "year": 2026, "month": "2026-07", "week": 28, "entry_price": 4164.91, "closing_price": 4141.84, "quantity": 0.02, "net_eur": -41.82, "balance_eur": 1202.27, "account_balance": 1202.27, "equity": 1202.27, "free_margin": 1202.27, "margin": 0.0, "margin_level": "n/a", "unrealized_pl": 0.0, "realized_pl": -82.28, "deposit": 5683.06, "withdrawal": -3673.56, "total_net": 2009.5, "source_file": "statement-18_31 06.07.2026.csv"}]}</script>
+  <script>
+    let payload = JSON.parse(document.getElementById('monitor-data').textContent);
+    const eur = value => new Intl.NumberFormat('de-DE', { style:'currency', currency:'EUR' }).format(Number(value || 0));
+    const pct = value => new Intl.NumberFormat('de-DE', { style:'percent', minimumFractionDigits:1, maximumFractionDigits:1 }).format(Number(value || 0));
+    let data = payload.trades || [];
+    document.getElementById('currentBalance').textContent = eur(payload.current_balance);
+    document.getElementById('generatedAt').textContent = 'Aktualisiert: ' + payload.generated_at;
+
+    function unique(list, getter) { return [...new Set(list.map(getter).filter(Boolean))].sort(); }
+    function fillSelect(id, values) {
+      const select = document.getElementById(id);
+      for (const value of values) {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      }
+    }
+    function resetSelect(id) {
+      const select = document.getElementById(id);
+      const first = select.options[0]?.cloneNode(true);
+      select.innerHTML = '';
+      if (first) select.appendChild(first);
+    }
+    function rebuildFilterOptions() {
+      ['symbolFilter','monthFilter','weekFilter','yearFilter'].forEach(resetSelect);
+      fillSelect('symbolFilter', unique(data, t => t.symbol));
+      fillSelect('monthFilter', unique(data, t => t.month));
+      fillSelect('weekFilter', unique(data, t => `${t.year}-KW${String(t.week).padStart(2,'0')}`));
+      fillSelect('yearFilter', unique(data, t => String(t.year)));
+    }
+
+    function filteredTrades() {
+      const symbol = document.getElementById('symbolFilter').value;
+      const month = document.getElementById('monthFilter').value;
+      const week = document.getElementById('weekFilter').value;
+      const year = document.getElementById('yearFilter').value;
+      const search = document.getElementById('searchBox').value.toLowerCase();
+      return data.filter(t =>
+        (!symbol || t.symbol === symbol) &&
+        (!month || t.month === month) &&
+        (!week || `${t.year}-KW${String(t.week).padStart(2,'0')}` === week) &&
+        (!year || String(t.year) === year) &&
+        (!search || JSON.stringify(t).toLowerCase().includes(search))
+      );
+    }
+
+    function calcMetrics(rows) {
+      const pnl = rows.map(t => Number(t.net_eur || 0));
+      const wins = pnl.filter(v => v > 0);
+      const losses = pnl.filter(v => v < 0);
+      let eq = 0, peak = 0, dd = 0, winStreak = 0, lossStreak = 0, maxWin = 0, maxLoss = 0;
+      pnl.forEach(v => {
+        eq += v; peak = Math.max(peak, eq); dd = Math.min(dd, eq - peak);
+        if (v > 0) { winStreak++; lossStreak = 0; } else if (v < 0) { lossStreak++; winStreak = 0; } else { winStreak = 0; lossStreak = 0; }
+        maxWin = Math.max(maxWin, winStreak); maxLoss = Math.max(maxLoss, lossStreak);
+      });
+      const grossProfit = wins.reduce((a,b)=>a+b,0);
+      const grossLoss = losses.reduce((a,b)=>a+b,0);
+      return {
+        trades: rows.length,
+        net: pnl.reduce((a,b)=>a+b,0),
+        grossProfit,
+        grossLoss,
+        profitFactor: grossLoss ? grossProfit / Math.abs(grossLoss) : 0,
+        winrate: rows.length ? wins.length / rows.length : 0,
+        avgWin: wins.length ? grossProfit / wins.length : 0,
+        avgLoss: losses.length ? grossLoss / losses.length : 0,
+        expectancy: rows.length ? pnl.reduce((a,b)=>a+b,0) / rows.length : 0,
+        maxDrawdown: Math.abs(dd),
+        winStreak: maxWin,
+        lossStreak: maxLoss
+      };
+    }
+
+    function drawLine(canvasId, points, color, fill=false) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.clientWidth * devicePixelRatio;
+      const h = canvas.height = 260 * devicePixelRatio;
+      ctx.clearRect(0,0,w,h);
+      ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
+      for (let i=0; i<5; i++) { const y = 20*devicePixelRatio + i*(h-40*devicePixelRatio)/4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      if (!points.length) return;
+      const values = points.map(p => p.value);
+      const min = Math.min(...values, 0), max = Math.max(...values, 0);
+      const span = max - min || 1;
+      const xy = points.map((p,i) => [points.length === 1 ? w/2 : i*(w-40*devicePixelRatio)/(points.length-1)+20*devicePixelRatio, h-20*devicePixelRatio-((p.value-min)/span)*(h-40*devicePixelRatio)]);
+      ctx.beginPath();
+      xy.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+      ctx.strokeStyle = color; ctx.lineWidth = 3 * devicePixelRatio; ctx.stroke();
+      if (fill) { ctx.lineTo(xy.at(-1)[0], h-20*devicePixelRatio); ctx.lineTo(xy[0][0], h-20*devicePixelRatio); ctx.closePath(); ctx.fillStyle = color + '22'; ctx.fill(); }
+    }
+
+    function drawBars(canvasId, rows, valueKey) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.clientWidth * devicePixelRatio;
+      const h = canvas.height = 260 * devicePixelRatio;
+      ctx.clearRect(0,0,w,h);
+      if (!rows.length) return;
+      const values = rows.map(r => Number(r[valueKey] || 0));
+      const maxAbs = Math.max(...values.map(Math.abs), 1);
+      const base = h / 2;
+      const bw = Math.max(18 * devicePixelRatio, (w - 40 * devicePixelRatio) / rows.length * 0.6);
+      rows.forEach((r,i) => {
+        const x = 20*devicePixelRatio + i*((w-40*devicePixelRatio)/rows.length) + bw*0.2;
+        const barH = Math.abs(Number(r[valueKey])) / maxAbs * (h/2 - 24*devicePixelRatio);
+        const y = Number(r[valueKey]) >= 0 ? base - barH : base;
+        ctx.fillStyle = Number(r[valueKey]) >= 0 ? '#16a34a' : '#dc2626';
+        ctx.fillRect(x, y, bw, barH);
+      });
+      ctx.strokeStyle = '#9ca3af'; ctx.beginPath(); ctx.moveTo(0,base); ctx.lineTo(w,base); ctx.stroke();
+    }
+
+    function tradeDate(t) { return String(t.closing_time || '').slice(0, 10); }
+    function weekKey(t) { return `${t.year}-KW${String(t.week).padStart(2,'0')}`; }
+    function isOpenTrade(t) { return String(t.status || t.trade_status || '').toUpperCase() === 'OPEN'; }
+    function statusEmoji(net) {
+      if (net > 0) return '🟢';
+      if (net < 0) return '🔴';
+      return '🟡';
+    }
+    function htmlEscape(value) {
+      return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function detailRows(items) {
+      return `<div class="detail-grid">${items.map(([k,v]) => `<div class="detail-item"><span>${htmlEscape(k)}</span><strong>${htmlEscape(v)}</strong></div>`).join('')}</div>`;
+    }
+    function showModal(title, body) {
+      document.getElementById('modalContent').innerHTML = `<h2>${htmlEscape(title)}</h2>${body}`;
+      document.getElementById('modal').classList.remove('hidden');
+    }
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+    function renderOpenTrades() {
+      const open = data.filter(isOpenTrade);
+      document.getElementById('openTradeTotal').textContent = `${open.length} offen`;
+      const box = document.getElementById('openTradesContent');
+      if (!open.length) {
+        box.innerHTML = `<div class="no-open">Keine offenen Positionen</div>`;
+        return;
+      }
+      const groups = ['Gold','Silver'].map(strategy => {
+        const rows = open.filter(t => t.strategy === strategy);
+        const long = rows.filter(t => ['BUY','LONG'].includes(String(t.direction).toUpperCase())).length;
+        const short = rows.filter(t => ['SELL','SHORT'].includes(String(t.direction).toUpperCase())).length;
+        return `<div class="open-card"><strong>${strategy}</strong><div>Long: ${long}</div><div>Short: ${short}</div></div>`;
+      }).join('');
+      box.innerHTML = groups + `<div class="open-card"><strong>Gesamt</strong><div>Anzahl offene Positionen: ${open.length}</div></div>`;
+    }
+
+    function setupCalendarOptions() {
+      const select = document.getElementById('calendarMonth');
+      const months = unique(data, t => t.month);
+      select.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
+      if (!select.value && months.length) select.value = months.at(-1);
+    }
+
+    function renderCalendar() {
+      const month = document.getElementById('calendarMonth').value || unique(data, t => t.month).at(-1);
+      const [year, monthNumber] = month.split('-').map(Number);
+      const first = new Date(year, monthNumber - 1, 1);
+      const last = new Date(year, monthNumber, 0);
+      const dayNames = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+      const byDate = new Map();
+      data.filter(t => t.month === month).forEach(t => {
+        const key = tradeDate(t);
+        byDate.set(key, (byDate.get(key) || 0) + Number(t.net_eur || 0));
+      });
+      const offset = (first.getDay() + 6) % 7;
+      const cells = dayNames.map(d => `<div class="calendar-head">${d}</div>`);
+      for (let i = 0; i < offset; i++) cells.push('<div class="calendar-day empty"></div>');
+      for (let day = 1; day <= last.getDate(); day++) {
+        const key = `${year}-${String(monthNumber).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const net = byDate.has(key) ? byDate.get(key) : null;
+        const emoji = net === null ? '⚪' : statusEmoji(net);
+        const amount = net === null ? 'Kein Trade' : eur(net);
+        cells.push(`<div class="calendar-day" data-day="${key}"><span class="num">${String(day).padStart(2,'0')}</span><span class="status">${emoji}</span><span class="amount">${amount}</span></div>`);
+      }
+      document.getElementById('calendarGrid').innerHTML = cells.join('');
+      document.querySelectorAll('[data-day]').forEach(el => el.addEventListener('click', () => showDayReport(el.dataset.day)));
+      renderWeekMonthLinks();
+    }
+
+    function renderWeekMonthLinks() {
+      const weeks = unique(data, weekKey);
+      const months = unique(data, t => t.month);
+      document.getElementById('weekLinks').innerHTML = weeks.map(w => `<button class="chip" data-week-chip="${w}">${w}</button>`).join('');
+      document.getElementById('monthLinks').innerHTML = months.map(m => `<button class="chip" data-month-chip="${m}">${m}</button>`).join('');
+      document.querySelectorAll('[data-week-chip]').forEach(el => el.addEventListener('click', () => showWeekReport(el.dataset.weekChip)));
+      document.querySelectorAll('[data-month-chip]').forEach(el => el.addEventListener('click', () => showMonthReport(el.dataset.monthChip)));
+    }
+
+    function reportBlock(title, rows) {
+      const m = calcMetrics(rows);
+      return `<h3>${htmlEscape(title)}</h3>` + detailRows([
+        ['Trades', m.trades], ['Netto Ergebnis', eur(m.net)], ['Gewinntrades', rows.filter(t => Number(t.net_eur) > 0).length],
+        ['Verlusttrades', rows.filter(t => Number(t.net_eur) < 0).length], ['Trefferquote', pct(m.winrate)], ['Profit Factor', m.profitFactor.toFixed(4)],
+        ['Max Drawdown', eur(m.maxDrawdown)], ['Gold Netto', eur(rows.filter(t=>t.strategy==='Gold').reduce((a,t)=>a+Number(t.net_eur || 0),0))],
+        ['Silver Netto', eur(rows.filter(t=>t.strategy==='Silver').reduce((a,t)=>a+Number(t.net_eur || 0),0))]
+      ]) + `<h3>Trades</h3><ul>${rows.map(t => `<li>${htmlEscape(t.closing_time)} · ${htmlEscape(t.symbol)} · ${htmlEscape(t.direction)} · ${eur(t.net_eur)}</li>`).join('') || '<li>Keine Trades</li>'}</ul>`;
+    }
+
+    function showDayReport(day) {
+      const rows = data.filter(t => tradeDate(t) === day);
+      const body = reportBlock(`Tagesreport ${day}`, rows);
+      document.getElementById('detailPanel').innerHTML = body;
+      showModal(`Trades am ${day}`, body);
+    }
+
+    function showWeekReport(week) {
+      const rows = data.filter(t => weekKey(t) === week);
+      const body = reportBlock(`Wochenreport ${week}`, rows);
+      document.getElementById('detailPanel').innerHTML = body;
+      showModal(`Wochenreport ${week}`, body);
+    }
+
+    function showMonthReport(month) {
+      document.getElementById('calendarMonth').value = month;
+      renderCalendar();
+      const rows = data.filter(t => t.month === month);
+      const body = reportBlock(`Monatsreport ${month}`, rows) + `<p class="legend">Der Tageskalender links zeigt die Tagesstatus des Monats.</p>`;
+      document.getElementById('detailPanel').innerHTML = body;
+      showModal(`Monatsreport ${month}`, body);
+    }
+
+    function showTradeDetail(tradeId) {
+      const t = data.find(x => x.trade_id === tradeId);
+      if (!t) return;
+      const body = detailRows([
+        ['Symbol', t.symbol], ['Strategie', t.strategy], ['Direction', t.direction], ['Lot', t.quantity],
+        ['Closing Time', t.closing_time], ['Entry Price', t.entry_price], ['Closing Price', t.closing_price],
+        ['Net EUR', eur(t.net_eur)], ['Balance EUR', eur(t.balance_eur)], ['Trade-Status', isOpenTrade(t) ? 'OPEN' : 'CLOSED'],
+        ['Kommentar', `Live-Trade aus ${t.source_file}`], ['Quelle', 'cTrader Statement']
+      ]);
+      showModal(`Trade-Details ${t.symbol} ${t.direction}`, body);
+    }
+
+    function setStrategyFilter(strategy) {
+      const symbolSelect = document.getElementById('symbolFilter');
+      if (strategy === 'Gold') {
+        symbolSelect.value = data.find(t => t.strategy === 'Gold')?.symbol || '';
+      } else if (strategy === 'Silver') {
+        const silverSymbol = data.find(t => t.strategy === 'Silver')?.symbol;
+        if (silverSymbol) {
+          symbolSelect.value = silverSymbol;
+        } else {
+          const opt = document.createElement('option');
+          opt.value = '__NO_SILVER__';
+          opt.textContent = 'Silver aktuell ohne Trades';
+          if (![...symbolSelect.options].some(item => item.value === '__NO_SILVER__')) symbolSelect.appendChild(opt);
+          symbolSelect.value = '__NO_SILVER__';
+        }
+      } else {
+        symbolSelect.value = '';
+        document.getElementById('monthFilter').value = '';
+        document.getElementById('weekFilter').value = '';
+        document.getElementById('yearFilter').value = '';
+      }
+      update();
+    }
+    function refreshDashboard(nextPayload) {
+      payload = nextPayload;
+      data = payload.trades || [];
+      document.getElementById('currentBalance').textContent = eur(payload.current_balance);
+      document.getElementById('generatedAt').textContent = 'Aktualisiert: ' + payload.generated_at;
+      rebuildFilterOptions();
+      setupCalendarOptions();
+      renderCalendar();
+      renderOpenTrades();
+      update();
+    }
+    async function loadDashboardDataJson() {
+      if (location.protocol === 'file:') return;
+      try {
+        const response = await fetch(`dashboard_data.json?ts=${Date.now()}`, { cache: 'no-store' });
+        if (!response.ok) return;
+        const externalPayload = await response.json();
+        if (externalPayload && Array.isArray(externalPayload.trades)) refreshDashboard(externalPayload);
+      } catch (error) {
+        console.info('Dashboard nutzt eingebettete Offline-Daten.', error);
+      }
+    }
+    function registerPwa() {
+      if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
+      navigator.serviceWorker.register('./service-worker.js').catch(error => {
+        console.info('Service Worker konnte nicht registriert werden.', error);
+      });
+    }
+
+    function update() {
+      const rows = filteredTrades();
+      const m = calcMetrics(rows);
+      const cards = [
+        ['Portfolio Netto', eur(m.net)], ['Trades gesamt', m.trades], ['Profit Factor', m.profitFactor.toFixed(4)],
+        ['Trefferquote', pct(m.winrate)], ['Ø Gewinn', eur(m.avgWin)], ['Ø Verlust', eur(m.avgLoss)],
+        ['Expectancy', eur(m.expectancy)], ['Max Drawdown', eur(m.maxDrawdown)], ['Gewinnserie', m.winStreak], ['Verlustserie', m.lossStreak]
+      ];
+      document.getElementById('kpiCards').innerHTML = cards.map(([k,v]) => `<div class="card"><span>${k}</span><strong>${v}</strong></div>`).join('');
+      const sorted = [...rows].sort((a,b)=>a.closing_time.localeCompare(b.closing_time));
+      let eq = 0, peak = 0;
+      const eqPoints = sorted.map(t => ({ label:t.closing_time, value:(eq += Number(t.net_eur || 0)) }));
+      const ddPoints = eqPoints.map(p => { peak = Math.max(peak, p.value); return { label:p.label, value:p.value - peak }; });
+      drawLine('equityChart', eqPoints, '#2563eb', true);
+      drawLine('drawdownChart', ddPoints, '#dc2626', true);
+      drawLine('balanceChart', sorted.map(t => ({ label:t.closing_time, value:Number(t.balance_eur || 0) })), '#0f766e', false);
+      const strategyRows = ['Gold','Silver','Portfolio'].map(name => ({ period:name, net:name === 'Portfolio' ? m.net : rows.filter(t=>t.strategy===name).reduce((a,t)=>a+Number(t.net_eur || 0),0) }));
+      drawBars('strategyChart', strategyRows, 'net');
+      drawBars('monthlyChart', group(rows, t=>t.month), 'net');
+      drawBars('weeklyChart', group(rows, t=>`${t.year}-KW${String(t.week).padStart(2,'0')}`), 'net');
+      document.querySelector('#tradeTable tbody').innerHTML = sorted.slice(-50).reverse().map(t => `<tr class="clickable" data-trade-id="${htmlEscape(t.trade_id)}"><td>${t.closing_time}</td><td>${t.symbol}</td><td>${t.strategy}</td><td>${t.direction}</td><td>${t.quantity}</td><td class="${t.net_eur >= 0 ? 'pos':'neg'}">${eur(t.net_eur)}</td><td>${eur(t.balance_eur)}</td><td>Öffnen</td></tr>`).join('');
+      document.querySelectorAll('[data-trade-id]').forEach(el => el.addEventListener('click', () => showTradeDetail(el.dataset.tradeId)));
+    }
+    function group(rows, getter) {
+      const map = new Map();
+      rows.forEach(t => { const key = getter(t); map.set(key, (map.get(key) || 0) + Number(t.net_eur || 0)); });
+      return [...map.entries()].sort().map(([period, net]) => ({ period, net }));
+    }
+    ['symbolFilter','monthFilter','weekFilter','yearFilter','searchBox'].forEach(id => document.getElementById(id).addEventListener('input', update));
+    document.getElementById('calendarMonth').addEventListener('input', () => {
+      renderCalendar();
+      showMonthReport(document.getElementById('calendarMonth').value);
+    });
+    document.getElementById('goldButton').addEventListener('click', () => setStrategyFilter('Gold'));
+    document.getElementById('silverButton').addEventListener('click', () => setStrategyFilter('Silver'));
+    document.getElementById('portfolioButton').addEventListener('click', () => setStrategyFilter('Portfolio'));
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modal').addEventListener('click', event => { if (event.target.id === 'modal') closeModal(); });
+    refreshDashboard(payload);
+    loadDashboardDataJson();
+    registerPwa();
+  </script>
+</body>
+</html>
