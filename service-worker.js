@@ -1,4 +1,4 @@
-const CACHE_NAME = "master-live-trading-monitor-2026-07-08-20-45-14";
+const CACHE_NAME = "master-live-trading-monitor-2026-07-08-20-45-56";
 const CORE_ASSETS = [
   "./",
   "./index.html",
